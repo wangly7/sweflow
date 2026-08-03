@@ -1,2 +1,3 @@
-# PRLens
-AI Code Review &amp; CI Reliability Platform
+# SWEFlow
+
+> Design-Driven Multi-Agent Software Engineering Platform
