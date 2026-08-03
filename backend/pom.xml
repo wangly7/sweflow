@@ -11,8 +11,8 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.prlens</groupId>
-    <artifactId>prlens-backend</artifactId>
+    <groupId>com.sweflow</groupId>
+    <artifactId>sweflow-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
