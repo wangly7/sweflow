@@ -21,6 +21,6 @@ public class PullRequestEventProducer {
                 event.prNumber(),
                 event.source()
         );
-        kafkaTemplate.send(KafkaTopics.PR_EVENTS, event.issueId(), event);
+        kafkaTemplate.send(KafkaTopics.PR_EVENTS, event.issueId().toString(), event);
     }
 }

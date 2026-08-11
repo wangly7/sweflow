@@ -1,21 +1,21 @@
-name: prlens
+name: sweflow
 
 services:
   postgres:
     image: postgres:16
-    container_name: prlens-postgres
+    container_name: sweflow-postgres
     environment:
-      POSTGRES_DB: prlens
-      POSTGRES_USER: prlens
-      POSTGRES_PASSWORD: prlens
+      POSTGRES_DB: sweflow
+      POSTGRES_USER: sweflow
+      POSTGRES_PASSWORD: sweflow
     ports:
       - "5432:5432"
     volumes:
-      - prlens_postgres_data:/var/lib/postgresql/data
+      - sweflow_postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7
-    container_name: prlens-redis
+    container_name: sweflow-redis
     ports:
       - "6379:6379"
     volumes:
@@ -23,7 +23,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
-    container_name: prlens-zookeeper
+    container_name: sweflow-zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -32,7 +32,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
-    container_name: prlens-kafka
+    container_name: sweflow-kafka
     depends_on:
       - zookeeper
     ports:
@@ -40,8 +40,8 @@ services:
       - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: prlens-zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://prlens-kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ZOOKEEPER_CONNECT: sweflow-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://sweflow-kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -49,34 +49,34 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
-    container_name: prlens-kafka-ui
+    container_name: sweflow-kafka-ui
     depends_on:
       - kafka
     ports:
       - "8085:8080"
     environment:
-      KAFKA_CLUSTERS_0_NAME: prlens-local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: prlens-kafka:29092
-      KAFKA_CLUSTERS_0_ZOOKEEPER: prlens-zookeeper:2181
+      KAFKA_CLUSTERS_0_NAME: sweflow-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: sweflow-kafka:29092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: sweflow-zookeeper:2181
   
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: prlens-pgadmin
+    container_name: sweflow-pgadmin
     depends_on:
       - postgres
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@prlens.com
+      PGADMIN_DEFAULT_EMAIL: admin@sweflow.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5050:80"
 
   minio:
     image: minio/minio
-    container_name: prlens-minio
+    container_name: sweflow-minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: prlens
-      MINIO_ROOT_PASSWORD: prlens
+      MINIO_ROOT_USER: sweflow
+      MINIO_ROOT_PASSWORD: sweflow
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -84,6 +84,6 @@ services:
       - minio-data:/data
 
 volumes:
-  prlens_postgres_data:
+  sweflow_postgres_data:
   redis-data:
   minio-data:

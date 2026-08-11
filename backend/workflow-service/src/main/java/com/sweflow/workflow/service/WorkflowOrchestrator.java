@@ -5,6 +5,7 @@ import com.sweflow.workflow.entity.WorkflowStepEntity;
 import com.sweflow.workflow.producer.CodingJobProducer;
 import com.sweflow.workflow.producer.DocJobProducer;
 import com.sweflow.common.events.*;
+import com.sweflow.workflow.producer.ReviewJobProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class WorkflowOrchestrator {
     public final WorkflowExecutionService workflowExecutionService;
     public final DocJobProducer docJobProducer;
     public final CodingJobProducer codingJobProducer;
+    public final ReviewJobProducer reviewJobProducer;
 
     public void handleIssueCreated(IssueCreatedEvent event) {
         StartedWorkflow workflow = workflowExecutionService.startWorkflow(event.issueId());
@@ -64,6 +66,24 @@ public class WorkflowOrchestrator {
     }
 
     public void handlePullRequestEvent(PullRequestEvent event) {
+        WorkflowStepEntity reviewStep = workflowExecutionService.moveToNextStep(
+                event.workflowId(),
+                event.workflowStepId(),
+                WorkflowStepType.AI_REVIEW
+        );
+
+        ReviewJobEvent reviewJobEvent = new ReviewJobEvent(
+                UUID.randomUUID(),
+                event.workflowId(),
+                reviewStep.getId(),
+                event.issueId(),
+                event.repository(),
+                event.prNumber(),
+                event.prUrl()
+        );
+
+        reviewJobProducer.publish(reviewJobEvent);
+
 
     }
 }

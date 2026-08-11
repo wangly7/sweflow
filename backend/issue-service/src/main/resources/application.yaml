@@ -3,9 +3,9 @@ spring:
     name: issue-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/prlens
-    username: prlens
-    password: prlens
+    url: jdbc:postgresql://localhost:5432/sweflow
+    username: sweflow
+    password: sweflow
     driver-class-name: org.postgresql.Driver
 
   flyway:

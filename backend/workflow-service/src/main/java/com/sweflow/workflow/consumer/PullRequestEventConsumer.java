@@ -19,5 +19,15 @@ public class PullRequestEventConsumer {
             groupId = "workflow-service"
     )
     public void consume(PullRequestEvent event) {
+        log.info(
+                "Received PullRequestEvent. eventId={}, workflowId={}, workflowStepId={}, issueId={}, prNumber={}",
+                event.eventId(),
+                event.workflowId(),
+                event.workflowStepId(),
+                event.issueId(),
+                event.prNumber()
+        );
+
+        orchestrator.handlePullRequestEvent(event);
     }
 }

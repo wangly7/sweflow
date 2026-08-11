@@ -18,7 +18,7 @@ public class CodingJobProducer {
     public void publish(CodingJobEvent event) {
         kafkaTemplate.send(
                 KafkaTopics.CODING_JOBS,
-                event.issueId(),
+                event.issueId().toString(),
                 event
         );
     }

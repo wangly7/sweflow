@@ -16,14 +16,13 @@ public class DocJobProducer {
     }
 
     public void publish(DocJobEvent event) {
-        log.info("Publishing DocJobEvent. topic={}, jobId={}, issueId={}",
+        log.info("Publishing DocJobEvent. topic={}, issueId={}",
                 KafkaTopics.DOC_JOBS,
-                event.jobId(),
                 event.issueId()
         );
         kafkaTemplate.send(
                 KafkaTopics.DOC_JOBS,
-                event.jobId(),
+                event.issueId().toString(),
                 event
         );
     }
