@@ -30,7 +30,9 @@ public class CodingAgentService {
         String branchName = "ai/isssue-" + event.eventId();
 
         PullRequestEvent pullRequestEvent = new PullRequestEvent(
-                UUID.randomUUID().toString(),
+                UUID.randomUUID(),
+                event.workflowId(),
+                event.workflowStepId(),
                 event.issueId(),
                 event.repository(),
                 1,
@@ -41,8 +43,8 @@ public class CodingAgentService {
         );
         pullRequestEventProducer.publish(pullRequestEvent);
         log.info(
-                "Completed mock coding job. jobId={}, issueId={}, branchName={}",
-                event.jobId(),
+                "Completed mock coding job. worfklowId={}, issueId={}, branchName={}",
+                event.workflowId(),
                 event.issueId(),
                 branchName
         );

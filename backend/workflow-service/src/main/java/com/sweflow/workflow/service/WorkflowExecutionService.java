@@ -76,4 +76,58 @@ public class WorkflowExecutionService {
 
         return nextStep;
     }
+
+    @Transactional
+    public void completeWorkflow(
+            UUID workflowId,
+            UUID currentStepId
+    ) {
+        WorkflowStepEntity currentStep = workflowStepRepository
+                .findById(currentStepId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Workflow step not found: " + currentStepId
+                ));
+
+        WorkflowExecutionEntity execution = workflowExecutionRepository
+                .findById(workflowId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Workflow execution not found: " + workflowId
+                ));
+
+        currentStep.setStatus(WorkflowStepStatus.COMPLETED);
+        currentStep.setCompletedAt(OffsetDateTime.now());
+
+        execution.setStatus(WorkflowStatus.COMPLETED);
+        execution.setCompletedAt(OffsetDateTime.now());
+
+        workflowStepRepository.save(currentStep);
+        workflowExecutionRepository.save(execution);
+    }
+
+    @Transactional
+    public void failWorkflow(
+            UUID workflowId,
+            UUID currentStepId
+    ) {
+        WorkflowStepEntity currentStep = workflowStepRepository
+                .findById(currentStepId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Workflow step not found: " + currentStepId
+                ));
+
+        WorkflowExecutionEntity execution = workflowExecutionRepository
+                .findById(workflowId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Workflow execution not found: " + workflowId
+                ));
+
+        currentStep.setStatus(WorkflowStepStatus.FAILED);
+        currentStep.setCompletedAt(OffsetDateTime.now());
+
+        execution.setStatus(WorkflowStatus.FAILED);
+        execution.setCompletedAt(OffsetDateTime.now());
+
+        workflowStepRepository.save(currentStep);
+        workflowExecutionRepository.save(execution);
+    }
 }

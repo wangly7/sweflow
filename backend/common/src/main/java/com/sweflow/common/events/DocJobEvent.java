@@ -12,6 +12,7 @@ public record DocJobEvent(
         String title,
         String description,
         String repository,
-        WorkflowStepType stepType
-) {
+        WorkflowStepType stepType,
+        String reviewFeedback
+        ) {
 }

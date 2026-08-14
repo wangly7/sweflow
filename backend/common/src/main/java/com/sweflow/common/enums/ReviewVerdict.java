@@ -2,6 +2,7 @@ package com.sweflow.common.enums;
 
 public enum ReviewVerdict {
     APPROVED,
-    CHANGES_REQUESTED,
+    CODE_CHANGES_REQUESTED,
+    DESIGN_CHANGES_REQUESTED,
     FAILED
 }

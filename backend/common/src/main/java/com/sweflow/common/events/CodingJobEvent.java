@@ -10,6 +10,7 @@ public record CodingJobEvent(
         UUID artifactId,
         String repository,
         String storagePath,
-        String targetBranch
+        String targetBranch,
+        String reviewFeedback
 ) {
 }

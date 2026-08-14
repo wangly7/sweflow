@@ -31,7 +31,8 @@ public class WorkflowOrchestrator {
                 event.title(),
                 event.description(),
                 event.repository(),
-                workflow.step().getStepType()
+                workflow.step().getStepType(),
+                null
         );
         this.docJobProducer.publish(job);
     }
@@ -53,7 +54,8 @@ public class WorkflowOrchestrator {
                 event.artifactId(),
                 event.repository(),
                 event.storagePath(),
-                targetBranch
+                targetBranch,
+                null
         );
         log.info(
                 "Dispatching coding job. eventId={},  workflowId={}, workflowStepId={}, issueId={}",
@@ -85,5 +87,40 @@ public class WorkflowOrchestrator {
         reviewJobProducer.publish(reviewJobEvent);
 
 
+    }
+
+    public void handleReviewResult(ReviewResultEvent event) {
+        switch (event.reviewVerdict()) {
+            case APPROVED -> {
+                workflowExecutionService.completeWorkflow(
+                        event.workflowId(),
+                        event.workflowStepId()
+                );
+            }
+            case CODE_CHANGES_REQUESTED ->  {
+                workflowExecutionService.moveToNextStep(
+                        event.workflowId(),
+                        event.workflowStepId(),
+                        WorkflowStepType.CODING
+                );
+
+                // TODO: how to modify code event
+            }
+            case DESIGN_CHANGES_REQUESTED -> {
+                workflowExecutionService.moveToNextStep(
+                        event.workflowId(),
+                        event.workflowStepId(),
+                        WorkflowStepType.DESIGN_DOCUMENT
+                );
+
+                // TODO: how to modify doc job event
+            }
+            case FAILED -> {
+                workflowExecutionService.failWorkflow(
+                        event.workflowId(),
+                        event.workflowStepId()
+                );
+            }
+        }
     }
 }
