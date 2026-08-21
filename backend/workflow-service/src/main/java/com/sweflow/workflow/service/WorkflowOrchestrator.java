@@ -6,10 +6,13 @@ import com.sweflow.workflow.producer.CodingJobProducer;
 import com.sweflow.workflow.producer.DocJobProducer;
 import com.sweflow.common.events.*;
 import com.sweflow.workflow.producer.ReviewJobProducer;
+import com.sweflow.workflow.repository.WorkflowStepRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -20,6 +23,7 @@ public class WorkflowOrchestrator {
     public final DocJobProducer docJobProducer;
     public final CodingJobProducer codingJobProducer;
     public final ReviewJobProducer reviewJobProducer;
+    private final WorkflowStepRepository workflowStepRepository;
 
     public void handleIssueCreated(IssueCreatedEvent event) {
         StartedWorkflow workflow = workflowExecutionService.startWorkflow(event.issueId());
@@ -28,9 +32,6 @@ public class WorkflowOrchestrator {
                 workflow.execution().getId(),
                 workflow.step().getId(),
                 event.issueId(),
-                event.title(),
-                event.description(),
-                event.repository(),
                 workflow.step().getStepType(),
                 null
         );
@@ -38,23 +39,21 @@ public class WorkflowOrchestrator {
     }
 
     public void handleArtifactGenerated(ArtifactGeneratedEvent event) {
+        Map<String, Object> config = Map.of(
+                "targetBranch", "ai/issue-"+event.issueId()
+        );
         WorkflowStepEntity codingStep = workflowExecutionService.moveToNextStep(
                 event.workflowId(),
                 event.workflowStepId(),
-                WorkflowStepType.CODING
+                WorkflowStepType.CODING,
+                config
         );
-
-        String targetBranch = "ai/" + event.issueId();
 
         CodingJobEvent codingJobEvent = new CodingJobEvent(
                 UUID.randomUUID(),
                 event.workflowId(),
                 codingStep.getId(),
                 event.issueId(),
-                event.artifactId(),
-                event.repository(),
-                event.storagePath(),
-                targetBranch,
                 null
         );
         log.info(
@@ -71,7 +70,8 @@ public class WorkflowOrchestrator {
         WorkflowStepEntity reviewStep = workflowExecutionService.moveToNextStep(
                 event.workflowId(),
                 event.workflowStepId(),
-                WorkflowStepType.AI_REVIEW
+                WorkflowStepType.AI_REVIEW,
+                Map.of()
         );
 
         ReviewJobEvent reviewJobEvent = new ReviewJobEvent(
@@ -79,9 +79,7 @@ public class WorkflowOrchestrator {
                 event.workflowId(),
                 reviewStep.getId(),
                 event.issueId(),
-                event.repository(),
-                event.prNumber(),
-                event.prUrl()
+                event.prNumber()
         );
 
         reviewJobProducer.publish(reviewJobEvent);
@@ -98,22 +96,51 @@ public class WorkflowOrchestrator {
                 );
             }
             case CODE_CHANGES_REQUESTED ->  {
-                workflowExecutionService.moveToNextStep(
+                WorkflowStepEntity previous = workflowStepRepository
+                        .findTopByWorkflowExecutionIdAndStepTypeOrderByStartedAtDesc(
+                                event.workflowId(),
+                                WorkflowStepType.CODING
+                ).orElseThrow(() -> new IllegalStateException(
+                        "previous coding step not found" + event.workflowId()
+                ));
+                String targetBranch = previous.getExecutionConfig().get("targetBranch").toString();
+                Map<String, Object> config = Map.of(
+                        "targetBranch", targetBranch
+                );
+                WorkflowStepEntity codingStep = workflowExecutionService.moveToNextStep(
                         event.workflowId(),
                         event.workflowStepId(),
-                        WorkflowStepType.CODING
+                        WorkflowStepType.CODING,
+                        config
                 );
 
-                // TODO: how to modify code event
+                CodingJobEvent codingJobEvent = new CodingJobEvent(
+                        UUID.randomUUID(),
+                        event.workflowId(),
+                        codingStep.getId(),
+                        event.issueId(),
+                        event.feedback()
+                );
+
+                codingJobProducer.publish(codingJobEvent);
             }
             case DESIGN_CHANGES_REQUESTED -> {
-                workflowExecutionService.moveToNextStep(
+                WorkflowStepEntity designStep = workflowExecutionService.moveToNextStep(
                         event.workflowId(),
                         event.workflowStepId(),
-                        WorkflowStepType.DESIGN_DOCUMENT
+                        WorkflowStepType.DESIGN_DOCUMENT,
+                        Map.of()
                 );
 
-                // TODO: how to modify doc job event
+                DocJobEvent docJobEvent = new DocJobEvent(
+                        UUID.randomUUID(),
+                        event.workflowId(),
+                        designStep.getId(),
+                        event.issueId(),
+                        WorkflowStepType.DESIGN_DOCUMENT,
+                        event.feedback()
+                );
+                docJobProducer.publish(docJobEvent);
             }
             case FAILED -> {
                 workflowExecutionService.failWorkflow(

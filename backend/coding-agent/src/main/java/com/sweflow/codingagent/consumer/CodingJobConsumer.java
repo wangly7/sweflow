@@ -21,11 +21,10 @@ public class CodingJobConsumer {
     )
     public void consume(CodingJobEvent event) {
         log.info(
-                "Received CodingJobEvent. workflowId={}. workflowStepId={}, issueId={}, artifactId={}",
+                "Received CodingJobEvent. workflowId={}. workflowStepId={}, issueId={}",
                 event.workflowId(),
                 event.workflowStepId(),
-                event.issueId(),
-                event.artifactId()
+                event.issueId()
         );
         codingAgentService.execute(event);
     }

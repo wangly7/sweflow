@@ -7,8 +7,6 @@ public record ReviewJobEvent(
         UUID workflowId,
         UUID workflowStepId,
         UUID issueId,
-        String repository,
-        Integer prNumber,
-        String prUrl
+        Integer prNumber
 ) {
 }

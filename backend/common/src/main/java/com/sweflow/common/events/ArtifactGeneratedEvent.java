@@ -10,7 +10,6 @@ public record ArtifactGeneratedEvent(
         UUID workflowId,
         UUID workflowStepId,
         UUID issueId,
-        String repository,
         ArtifactType artifactType,
         String storagePath,
         String createdByAgent

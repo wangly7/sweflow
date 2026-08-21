@@ -1,3 +1,5 @@
 spring:
   application:
     name: ai-review-worker
+mock:
+  review-verdict: APPROVED

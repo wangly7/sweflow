@@ -9,9 +9,6 @@ public record DocJobEvent(
         UUID workflowId,
         UUID workflowStepId,
         UUID issueId,
-        String title,
-        String description,
-        String repository,
         WorkflowStepType stepType,
         String reviewFeedback
         ) {

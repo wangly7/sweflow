@@ -57,9 +57,9 @@ public class DesignDocAgent {
 
                     Trigger coding-agent to create a code change based on this design document.
                     """.formatted(
-                    event.title(),
-                    event.description(),
-                    event.repository()
+                    "Mock Title",
+                    "Mock Description",
+                    "Mock repository"
             );
 
             Files.writeString(filePath, content);
@@ -72,7 +72,6 @@ public class DesignDocAgent {
                     event.workflowId(),
                     event.workflowStepId(),
                     event.issueId(),
-                    event.repository(),
                     ArtifactType.DESIGN_DOC,
                     filePath.toString(),
                     "doc-agent"

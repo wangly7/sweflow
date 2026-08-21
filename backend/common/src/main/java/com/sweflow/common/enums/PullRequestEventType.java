@@ -2,7 +2,7 @@ package com.sweflow.common.enums;
 
 public enum PullRequestEventType {
     OPENED,
-    UPDAsTED,
+    UPDATED,
     CLOSED,
     MERGED
 }

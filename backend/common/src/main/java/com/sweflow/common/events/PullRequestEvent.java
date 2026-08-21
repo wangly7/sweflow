@@ -9,7 +9,6 @@ public record PullRequestEvent(
         UUID workflowId,
         UUID workflowStepId,
         UUID issueId,
-        String repository,
         Integer prNumber,
         String prUrl,
         String branchName,

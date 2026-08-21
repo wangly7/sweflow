@@ -9,7 +9,6 @@ public record ReviewResultEvent(
         UUID workflowId,
         UUID workflowStepId,
         UUID issueId,
-        String repository,
         Integer prNumber,
         ReviewVerdict reviewVerdict,
         String summary,

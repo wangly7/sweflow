@@ -19,14 +19,6 @@ public class CodingAgentService {
     private final PullRequestEventProducer pullRequestEventProducer;
 
     public void execute(CodingJobEvent event) {
-        Path designDocPath = Path.of(event.storagePath());
-
-        if (!Files.exists(designDocPath)) {
-            throw new IllegalStateException(
-                    "Design document does not exist: " + designDocPath
-            );
-        }
-
         String branchName = "ai/isssue-" + event.eventId();
 
         PullRequestEvent pullRequestEvent = new PullRequestEvent(
@@ -34,7 +26,6 @@ public class CodingAgentService {
                 event.workflowId(),
                 event.workflowStepId(),
                 event.issueId(),
-                event.repository(),
                 1,
                 "https://github.com/example/example/pull/1",
                 branchName,
@@ -43,7 +34,7 @@ public class CodingAgentService {
         );
         pullRequestEventProducer.publish(pullRequestEvent);
         log.info(
-                "Completed mock coding job. worfklowId={}, issueId={}, branchName={}",
+                "Completed mock coding job. workflowId={}, issueId={}, branchName={}",
                 event.workflowId(),
                 event.issueId(),
                 branchName

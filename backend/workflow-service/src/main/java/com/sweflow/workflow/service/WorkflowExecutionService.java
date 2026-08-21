@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -47,7 +48,8 @@ public class WorkflowExecutionService {
     public WorkflowStepEntity moveToNextStep(
             UUID workflowId,
             UUID currentStepId,
-            WorkflowStepType nextStepType
+            WorkflowStepType nextStepType,
+            Map<String, Object> executionConfig
     ) {
         WorkflowStepEntity currentStep = workflowStepRepository.findById(currentStepId)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -66,6 +68,7 @@ public class WorkflowExecutionService {
                 .workflowExecutionId(workflowId)
                 .stepType(nextStepType)
                 .status(WorkflowStepStatus.RUNNING)
+                .executionConfig(executionConfig)
                 .build();
 
         execution.setCurrentStep(nextStepType);

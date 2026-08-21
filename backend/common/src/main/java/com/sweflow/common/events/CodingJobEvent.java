@@ -7,10 +7,6 @@ public record CodingJobEvent(
         UUID workflowId,
         UUID workflowStepId,
         UUID issueId,
-        UUID artifactId,
-        String repository,
-        String storagePath,
-        String targetBranch,
         String reviewFeedback
 ) {
 }

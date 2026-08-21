@@ -11,7 +11,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name="workflow_execution")
+@Table(name="workflow_executions")
 @Getter
 @Setter
 @NoArgsConstructor
