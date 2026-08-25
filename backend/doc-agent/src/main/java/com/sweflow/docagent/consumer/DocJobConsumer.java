@@ -1,8 +1,8 @@
-package com.swe.docagent.consumer;
+package com.sweflow.docagent.consumer;
 
 import com.sweflow.common.constants.KafkaTopics;
 import com.sweflow.common.events.DocJobEvent;
-import com.swe.docagent.service.DocAgentDispatcher;
+import com.sweflow.docagent.service.DocAgentDispatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

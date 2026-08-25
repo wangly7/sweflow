@@ -1,4 +1,4 @@
-package com.swe.docagent.producer;
+package com.sweflow.docagent.producer;
 
 import com.sweflow.common.constants.KafkaTopics;
 import com.sweflow.common.events.ArtifactGeneratedEvent;

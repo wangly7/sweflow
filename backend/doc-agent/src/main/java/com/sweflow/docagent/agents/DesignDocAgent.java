@@ -1,39 +1,30 @@
-package com.swe.docagent.agents;
+package com.sweflow.docagent.agents;
 
 import com.sweflow.common.enums.ArtifactType;
 import com.sweflow.common.events.ArtifactGeneratedEvent;
 import com.sweflow.common.events.DocJobEvent;
-import com.swe.docagent.producer.ArtifactEventProducer;
+import com.sweflow.docagent.producer.ArtifactEventProducer;
+import com.sweflow.storage.ArtifactStorage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class DesignDocAgent {
     private final ArtifactEventProducer artifactEventProducer;
-    private final String outputDir;
-
-    public DesignDocAgent(
-            ArtifactEventProducer artifactEventProducer,
-            @Value("${doc-agent.output-dir}") String outputDir
-    ) {
-        this.artifactEventProducer = artifactEventProducer;
-        this.outputDir = outputDir;
-    }
+    private final ArtifactStorage artifactStorage;
 
     public void generate(DocJobEvent event) {
         try {
-            Files.createDirectories(Path.of(outputDir));
-
-            String fileName = event.issueId() + ".md";
-            Path filePath = Path.of(outputDir, fileName);
-
             String content = """
                     # Design Document
 
@@ -62,9 +53,20 @@ public class DesignDocAgent {
                     "Mock repository"
             );
 
-            Files.writeString(filePath, content);
-            log.info("Generated design document. issueId={}, path={}",
-                    event.issueId(), filePath);
+            UUID artifactId = UUID.randomUUID();
+
+            String objectKey = String.format(
+                    "%s/%s/%s",
+                    event.workflowId(),
+                    ArtifactType.DESIGN_DOC.name(),
+                    artifactId
+            );
+
+            artifactStorage.upload(
+                    objectKey,
+                    content.getBytes(StandardCharsets.UTF_8),
+                    "text/markdown"
+            );
 
             ArtifactGeneratedEvent artifactEvent = new ArtifactGeneratedEvent(
                     UUID.randomUUID(),
@@ -73,11 +75,11 @@ public class DesignDocAgent {
                     event.workflowStepId(),
                     event.issueId(),
                     ArtifactType.DESIGN_DOC,
-                    filePath.toString(),
+                    objectKey,
                     "doc-agent"
             );
             artifactEventProducer.publish(artifactEvent);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to design doc document. issueId = {}",
                     event.issueId(), e);
             throw new RuntimeException(e);

@@ -1,8 +1,8 @@
-package com.swe.docagent.service;
+package com.sweflow.docagent.service;
 
 import com.sweflow.common.enums.WorkflowStepType;
 import com.sweflow.common.events.DocJobEvent;
-import com.swe.docagent.agents.DesignDocAgent;
+import com.sweflow.docagent.agents.DesignDocAgent;
 import org.springframework.stereotype.Service;
 
 @Service
