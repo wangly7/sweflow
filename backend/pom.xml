@@ -24,6 +24,7 @@
         <module>doc-agent</module>
         <module>ai-review-worker</module>
         <module>coding-agent</module>
+        <module>artifact-storage</module>
     </modules>
 
     <properties>
