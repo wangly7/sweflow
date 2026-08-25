@@ -76,7 +76,7 @@ services:
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: sweflow
-      MINIO_ROOT_PASSWORD: sweflow
+      MINIO_ROOT_PASSWORD: sweflow123
     ports:
       - "9000:9000"
       - "9001:9001"
