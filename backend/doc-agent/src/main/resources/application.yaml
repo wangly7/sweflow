@@ -27,3 +27,6 @@ artifact-storage:
     access-key: sweflow
     secret-key: sweflow123
     bucket: sweflow-artifacts
+services:
+  issue-service:
+    base-url: http://localhost:8081

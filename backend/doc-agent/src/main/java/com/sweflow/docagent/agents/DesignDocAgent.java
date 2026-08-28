@@ -1,8 +1,10 @@
 package com.sweflow.docagent.agents;
 
+import com.sweflow.common.dto.IssueResponse;
 import com.sweflow.common.enums.ArtifactType;
 import com.sweflow.common.events.ArtifactGeneratedEvent;
 import com.sweflow.common.events.DocJobEvent;
+import com.sweflow.docagent.client.IssueClient;
 import com.sweflow.docagent.producer.ArtifactEventProducer;
 import com.sweflow.storage.ArtifactStorage;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +24,13 @@ import java.util.UUID;
 public class DesignDocAgent {
     private final ArtifactEventProducer artifactEventProducer;
     private final ArtifactStorage artifactStorage;
+    private final IssueClient issueClient;
 
     public void generate(DocJobEvent event) {
         try {
+            IssueResponse issueContext = issueClient.getIssue(
+                    event.issueId()
+            );
             String content = """
                     # Design Document
 
@@ -48,9 +54,14 @@ public class DesignDocAgent {
 
                     Trigger coding-agent to create a code change based on this design document.
                     """.formatted(
-                    "Mock Title",
-                    "Mock Description",
-                    "Mock repository"
+                    issueContext.title(),
+                    issueContext.description(),
+                    issueContext.repository()
+            );
+            log.info(
+                    "Issue context built. title={}, repository={}",
+                    issueContext.title(),
+                    issueContext.repository()
             );
 
             UUID artifactId = UUID.randomUUID();
@@ -70,7 +81,7 @@ public class DesignDocAgent {
 
             ArtifactGeneratedEvent artifactEvent = new ArtifactGeneratedEvent(
                     UUID.randomUUID(),
-                    UUID.randomUUID(),
+                    artifactId,
                     event.workflowId(),
                     event.workflowStepId(),
                     event.issueId(),
