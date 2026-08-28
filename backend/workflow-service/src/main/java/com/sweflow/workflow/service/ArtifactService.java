@@ -1,5 +1,6 @@
 package com.sweflow.workflow.service;
 
+import com.sweflow.common.enums.ArtifactType;
 import com.sweflow.common.events.ArtifactGeneratedEvent;
 import com.sweflow.workflow.entity.WorkflowArtifactEntity;
 import com.sweflow.workflow.repository.WorkflowArtifactRepository;
@@ -36,5 +37,21 @@ public class ArtifactService {
                         .build();
 
         return workflowArtifactRepository.save(artifact);
+    }
+
+    public WorkflowArtifactEntity getLatestArtifact(
+            UUID workflowId,
+            ArtifactType artifactType
+    ) {
+        WorkflowArtifactEntity artifact = workflowArtifactRepository
+                .findTopByWorkflowIdAndArtifactTypeOrderByVersionDesc(
+                        workflowId,
+                        artifactType
+                ).orElseThrow(() -> new IllegalStateException(
+                        "Artifact not found, workflowId: "
+                        + workflowId + ", artifactType: "
+                        + artifactType
+                ));
+        return artifact;
     }
 }
