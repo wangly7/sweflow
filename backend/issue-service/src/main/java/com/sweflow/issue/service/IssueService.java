@@ -1,5 +1,6 @@
 package com.sweflow.issue.service;
 
+import com.sweflow.common.dto.IssueResponse;
 import com.sweflow.common.events.IssueCreatedEvent;
 import com.sweflow.issue.dto.CreateIssueRequest;
 import com.sweflow.issue.dto.CreateIssueResponse;
@@ -46,5 +47,17 @@ public class IssueService {
 
         issueEventProducer.publish(event);
         return  new CreateIssueResponse(issueId, IssueStatus.CREATED);
+    }
+
+    public IssueResponse getIssue(UUID issueId) {
+        IssueEntity issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Issue not found: " + issueId
+                ));
+        return new IssueResponse(
+                issue.getRepository(),
+                issue.getTitle(),
+                issue.getDescription()
+        );
     }
 }
