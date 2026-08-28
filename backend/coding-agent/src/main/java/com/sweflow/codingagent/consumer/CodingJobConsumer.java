@@ -28,5 +28,4 @@ public class CodingJobConsumer {
         );
         codingAgentService.execute(event);
     }
-
 }
