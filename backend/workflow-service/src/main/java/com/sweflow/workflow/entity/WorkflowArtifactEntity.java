@@ -43,4 +43,10 @@ public class WorkflowArtifactEntity {
             updatable = false
     )
     private OffsetDateTime createdAt;
+
+    @Column(name = "base_branch")
+    private String baseBranch;
+
+    @Column(name = "base_revision")
+    private String baseRevision;
 }
